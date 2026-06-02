@@ -1,7 +1,7 @@
 // src/api/authApi.js
 // All auth API calls — import this anywhere in your React app
 
-const API = "http://localhost:5000/api";
+const API = "https://ats-backend-s69p.onrender.com/api";
 
 // ── Get stored token ──────────────────────────────────────────────────────────
 export const getToken = () => localStorage.getItem("ats_token");

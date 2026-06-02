@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 
-const API = 'http://localhost:5000/api/auth'
+const API = 'https://ats-backend-s69p.onrender.com/api/auth'
 
 export default function LoginPage({ onLogin, onSignUp }) {
   const [email, setEmail]       = useState('')
@@ -11,7 +11,7 @@ export default function LoginPage({ onLogin, onSignUp }) {
 
   useEffect(() => {
     const handler = (e) => {
-      if (e.origin !== 'http://localhost:5000') return
+      if (e.origin !== 'https://ats-backend-s69p.onrender.com') return
       if (e.data?.token && e.data?.user) {
         localStorage.setItem('ats_token', e.data.token)
         onLogin({ user: e.data.user })
@@ -194,7 +194,7 @@ function ApiStatus() {
   const [status, setStatus] = useState('checking')
   const check = () => {
     setStatus('checking')
-    fetch('http://localhost:5000/api/health', { signal: AbortSignal.timeout(3000) })
+    fetch('https://ats-backend-s69p.onrender.com/api/health', { signal: AbortSignal.timeout(3000) })
       .then(r => setStatus(r.ok ? 'online' : 'offline'))
       .catch(() => setStatus('offline'))
   }
