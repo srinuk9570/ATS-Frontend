@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ResumeATS - AI-Powered Resume Analysis</title>
+
+    <!-- Favicon from your public folder -->
+    <link rel="icon" type="image/png" href="/Image.png" />
+
+    <!-- Web Manifest -->
+    <link rel="manifest" href="/site.webmanifest" />
+
+    <!-- Google Fonts preconnect (both need crossorigin) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- PDF.js: defer so it doesn't block rendering -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
+      defer
+    ></script>
+
+    <!-- Mammoth.js: defer so it doesn't block rendering -->
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/mammoth/1.6.0/mammoth.browser.min.js"
+      defer
+    ></script>
+
+    <!-- Set PDF.js worker AFTER the library has loaded -->
+    <script defer>
+      window.addEventListener('DOMContentLoaded', function () {
+        if (typeof pdfjsLib !== 'undefined') {
+          pdfjsLib.GlobalWorkerOptions.workerSrc =
+            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+      });
+    </script>
+  </head>
+  <body>
+    <div id="root"></div>
+
+    <!-- React entry point (module scripts are deferred by default) -->
+    <script type="module" src="/src/main.jsx"></script>
+  </body>
+</html>
