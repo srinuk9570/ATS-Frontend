@@ -26,7 +26,7 @@ export default function Apply() {
 
   // ── fetch job details ──────────────────────────────────────────────────────
   useEffect(() => {
-    fetch(`http://localhost:5000/api/jobs/${jobId}`)
+    fetch(`https://ats-backend-s69p.onrender.com/api/jobs/${jobId}`)
       .then(r => (r.ok ? r.json() : null))
       .then(data =>
         setJob(
@@ -85,7 +85,7 @@ export default function Apply() {
 
     try {
       const payload = { ...form, jobId, fileName: file?.name };
-      await fetch("http://localhost:5000/api/candidates/apply", {
+      await fetch("https://ats-backend-s69p.onrender.com/api/candidates/apply", {
         method:  "POST",
         headers: { "Content-Type": "application/json" },
         body:    JSON.stringify(payload),

@@ -3,7 +3,7 @@ import { useState, useRef } from 'react'
 // ─── replace with your backend caller ───
 async function askAI(prompt, maxTokens = 1500) {
   try {
-    const res = await fetch('http://localhost:5000/api/ai', {
+    const res = await fetch('https://ats-backend-s69p.onrender.com/api/ai', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ message: prompt, maxTokens })

@@ -1795,7 +1795,7 @@ function LoginPage({ onLogin, onSignUp, onBack }) {
     if (!password || password.length < 6)      { setError('Password must be at least 6 characters.'); return; }
     setLoading(true);
     try {
-      const res  = await fetch('http://localhost:5000/api/auth/login', {
+      const res  = await fetch('https://ats-backend-s69p.onrender.com/api/auth/login', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
       });
@@ -1860,7 +1860,7 @@ function LoginPage({ onLogin, onSignUp, onBack }) {
             <button onClick={onSignUp} style={{ background:'none', border:'none', color:'#4F46E5', fontWeight:600, cursor:'pointer', fontSize:14, padding:0 }}>Sign up</button>
           </p>
           <button
-            onClick={() => { const w=500,h=600,l=window.screenX+(window.outerWidth-w)/2,t=window.screenY+(window.outerHeight-h)/2; window.open('http://localhost:5000/api/auth/google',`google_oauth`,`width=${w},height=${h},left=${l},top=${t}`); }}
+            onClick={() => { const w=500,h=600,l=window.screenX+(window.outerWidth-w)/2,t=window.screenY+(window.outerHeight-h)/2; window.open('https://ats-backend-s69p.onrender.com/api/auth/google',`google_oauth`,`width=${w},height=${h},left=${l},top=${t}`); }}
             style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'center', gap:10, padding:'11px 14px', border:'1.5px solid #E2E8F0', borderRadius:10, background:'#fff', color:'#0F172A', fontSize:14, fontWeight:500, cursor:'pointer', marginBottom:10, transition:'all .15s', boxShadow:'0 1px 3px rgba(0,0,0,0.05)' }}
             onMouseEnter={e=>{ e.currentTarget.style.borderColor='#C7D2FE'; e.currentTarget.style.background='#F8FAFC'; }}
             onMouseLeave={e=>{ e.currentTarget.style.borderColor='#E2E8F0'; e.currentTarget.style.background='#fff'; }}>
@@ -1923,7 +1923,7 @@ function SignUpPage({ onSignUp, onLogin, onBack }) {
     if (password.length < 6)    { setError('Password must be at least 6 characters.'); return; }
     setLoading(true);
     try {
-      const res  = await fetch('http://localhost:5000/api/auth/register', {
+      const res  = await fetch('https://ats-backend-s69p.onrender.com/api/auth/register', {
         method: 'POST', headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password }),
       });
@@ -2019,7 +2019,7 @@ function ApiStatusBadge() {
   const [status, setStatus] = useState('checking');
   const check = () => {
     setStatus('checking');
-    fetch('http://localhost:5000/api/health', { signal: AbortSignal.timeout(3000) })
+    fetch('https://ats-backend-s69p.onrender.com/api/health', { signal: AbortSignal.timeout(3000) })
       .then(r => setStatus(r.ok ? 'online' : 'offline'))
       .catch(() => setStatus('offline'));
   };
