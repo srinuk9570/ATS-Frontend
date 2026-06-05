@@ -1,21 +1,15 @@
-// src/api/authApi.js
-// All auth API calls — import this anywhere in your React app
-
 const API = "https://ats-backend-s69p.onrender.com/api";
 
-// ── Get stored token ──────────────────────────────────────────────────────────
-export const getToken = () => localStorage.getItem("ats_token");
-export const getUser  = () => JSON.parse(localStorage.getItem("ats_user") || "null");
+export const getToken   = () => localStorage.getItem("ats_token");
+export const getUser    = () => JSON.parse(localStorage.getItem("ats_user") || "null");
 export const isLoggedIn = () => !!getToken();
 
-// ── Logout ────────────────────────────────────────────────────────────────────
 export const logout = () => {
   localStorage.removeItem("ats_token");
   localStorage.removeItem("ats_user");
-  window.location.href = "/login";
+  window.location.href = "/";
 };
 
-// ── Login ─────────────────────────────────────────────────────────────────────
 export const login = async (email, password) => {
   const res  = await fetch(`${API}/auth/login`, {
     method:  "POST",
@@ -29,7 +23,6 @@ export const login = async (email, password) => {
   return data;
 };
 
-// ── Register ──────────────────────────────────────────────────────────────────
 export const register = async (name, email, password) => {
   const res  = await fetch(`${API}/auth/register`, {
     method:  "POST",
@@ -43,7 +36,6 @@ export const register = async (name, email, password) => {
   return data;
 };
 
-// ── Authenticated fetch (use this for all protected routes) ───────────────────
 export const authFetch = async (url, options = {}) => {
   const token = getToken();
   const res = await fetch(`${API}${url}`, {

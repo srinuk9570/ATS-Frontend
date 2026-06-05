@@ -131,15 +131,27 @@ const NAV_ITEMS = [
    ROOT APP
 ══════════════════════════════════ */
 export default function App() {
-  const [page, setPage] = useState('landing');
-  const [user, setUser] = useState(null);
+  const [page, setPage] = useState(() => {
+    const saved = localStorage.getItem('ats_user');
+    return saved ? 'app' : 'landing';
+  });
+  const [user, setUser] = useState(() => {
+    const saved = localStorage.getItem('ats_user');
+    return saved ? JSON.parse(saved) : null;
+  });
 
-  const handleLogin = (data) => { setUser(data.user); setPage('app'); };
+  const handleLogin = (data) => {
+    setUser(data.user);
+    setPage('app');
+    localStorage.setItem('ats_user', JSON.stringify(data.user));
+    if (data.token) localStorage.setItem('ats_token', data.token);
+  };
+
   const handleLogout = () => {
     setUser(null);
+    setPage('landing');
     localStorage.removeItem('ats_token');
     localStorage.removeItem('ats_user');
-    setPage('landing');
   };
 
   return (

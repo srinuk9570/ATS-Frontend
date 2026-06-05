@@ -34,12 +34,20 @@ export default function LoginPage({ onLogin, onSignUp }) {
         body: JSON.stringify({ email, password }),
       })
       const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Invalid email or password.')
+      
+      // CORRECTED: Check if response is OK before proceeding
+      if (!res.ok) {
+        throw new Error(data.error || 'Invalid email or password.')
+      }
+      
+      // Only store token and call onLogin if login was successful
       localStorage.setItem('ats_token', data.token)
       onLogin({ user: data.user })
     } catch (err) {
       setError(err.message)
-    } finally { setLoading(false) }
+    } finally { 
+      setLoading(false) 
+    }
   }
 
   const openOAuth = (provider) => {
