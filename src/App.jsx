@@ -1801,6 +1801,22 @@ function LoginPage({ onLogin, onSignUp, onBack }) {
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState('');
 
+  // ── Google OAuth postMessage listener ──
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.origin !== 'https://ats-backend-s69p.onrender.com') return;
+      if (e.data?.type === 'oauth_success' && e.data?.token && e.data?.user) {
+        localStorage.setItem('ats_token', e.data.token);
+        localStorage.setItem('ats_user', JSON.stringify(e.data.user));
+        onLogin({ user: e.data.user, token: e.data.token });
+      } else if (e.data?.type === 'oauth_error') {
+        setError(e.data.error || 'Google login failed.');
+      }
+    };
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+  }, [onLogin]);
+
   const handleLogin = async () => {
     setError('');
     if (!email.trim() || !email.includes('@')) { setError('Please enter a valid email address.'); return; }
@@ -1815,9 +1831,9 @@ function LoginPage({ onLogin, onSignUp, onBack }) {
       if (!res.ok) throw new Error(data.error || 'Invalid email or password.');
       localStorage.setItem('ats_token', data.token);
       localStorage.setItem('ats_user', JSON.stringify(data.user));
-      onLogin({ user: data.user });
+      onLogin({ user: data.user, token: data.token });
     } catch (err) {
-      onLogin({ user: { name: email.split('@')[0] || 'User', email } });
+      setError(err.message);
     } finally { setLoading(false); }
   };
 
@@ -1838,9 +1854,9 @@ function LoginPage({ onLogin, onSignUp, onBack }) {
         <div style={{ fontSize:14, color:'rgba(255,255,255,0.7)', lineHeight:1.7, marginBottom:40 }}>Beat ATS filters. Land more interviews.<br />Powered by real-time AI analysis.</div>
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10, marginBottom:36 }}>
           {[
-            { label:'ATS Score',     value:'87%',          color:'#34D399', bar:87 },
-            { label:'Keyword Match', value:'92%',          color:'#FCD34D', bar:92 },
-            { label:'Skills Found',  value:'14',           color:'#A78BFA', bar:70 },
+            { label:'ATS Score',     value:'87%',           color:'#34D399', bar:87 },
+            { label:'Keyword Match', value:'92%',           color:'#FCD34D', bar:92 },
+            { label:'Skills Found',  value:'14',            color:'#A78BFA', bar:70 },
             { label:'Missing',       value:'React, Docker', color:'#FCA5A5', bar:0  },
           ].map(c => (
             <div key={c.label} style={{ background:'rgba(255,255,255,0.1)', borderRadius:12, padding:'14px 16px', backdropFilter:'blur(8px)', border:'1px solid rgba(255,255,255,0.15)' }}>
@@ -1872,7 +1888,10 @@ function LoginPage({ onLogin, onSignUp, onBack }) {
             <button onClick={onSignUp} style={{ background:'none', border:'none', color:'#4F46E5', fontWeight:600, cursor:'pointer', fontSize:14, padding:0 }}>Sign up</button>
           </p>
           <button
-            onClick={() => { const w=500,h=600,l=window.screenX+(window.outerWidth-w)/2,t=window.screenY+(window.outerHeight-h)/2; window.open('https://ats-backend-s69p.onrender.com/api/auth/google',`google_oauth`,`width=${w},height=${h},left=${l},top=${t}`); }}
+            onClick={() => {
+              const w=500,h=600,l=window.screenX+(window.outerWidth-w)/2,t=window.screenY+(window.outerHeight-h)/2;
+              window.open('https://ats-backend-s69p.onrender.com/api/auth/google','google_oauth',`width=${w},height=${h},left=${l},top=${t}`);
+            }}
             style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'center', gap:10, padding:'11px 14px', border:'1.5px solid #E2E8F0', borderRadius:10, background:'#fff', color:'#0F172A', fontSize:14, fontWeight:500, cursor:'pointer', marginBottom:10, transition:'all .15s', boxShadow:'0 1px 3px rgba(0,0,0,0.05)' }}
             onMouseEnter={e=>{ e.currentTarget.style.borderColor='#C7D2FE'; e.currentTarget.style.background='#F8FAFC'; }}
             onMouseLeave={e=>{ e.currentTarget.style.borderColor='#E2E8F0'; e.currentTarget.style.background='#fff'; }}>
@@ -1928,6 +1947,22 @@ function SignUpPage({ onSignUp, onLogin, onBack }) {
   const [loading, setLoading]   = useState(false);
   const [error, setError]       = useState('');
 
+  // ── Google OAuth postMessage listener ──
+  useEffect(() => {
+    const handler = (e) => {
+      if (e.origin !== 'https://ats-backend-s69p.onrender.com') return;
+      if (e.data?.type === 'oauth_success' && e.data?.token && e.data?.user) {
+        localStorage.setItem('ats_token', e.data.token);
+        localStorage.setItem('ats_user', JSON.stringify(e.data.user));
+        onSignUp({ user: e.data.user, token: e.data.token });
+      } else if (e.data?.type === 'oauth_error') {
+        setError(e.data.error || 'Google login failed.');
+      }
+    };
+    window.addEventListener('message', handler);
+    return () => window.removeEventListener('message', handler);
+  }, [onSignUp]);
+
   const handleSignUp = async () => {
     setError('');
     if (!name.trim())           { setError('Full name is required.'); return; }
@@ -1943,9 +1978,9 @@ function SignUpPage({ onSignUp, onLogin, onBack }) {
       if (!res.ok) throw new Error(data.error || 'Registration failed.');
       localStorage.setItem('ats_token', data.token);
       localStorage.setItem('ats_user', JSON.stringify(data.user));
-      onSignUp({ user: data.user });
+      onSignUp({ user: data.user, token: data.token });
     } catch (err) {
-      onSignUp({ user: { name, email } });
+      setError(err.message);
     } finally { setLoading(false); }
   };
 
@@ -1967,10 +2002,10 @@ function SignUpPage({ onSignUp, onLogin, onBack }) {
         <div style={{ fontSize:14, color:'rgba(255,255,255,0.7)', lineHeight:1.7, marginBottom:40 }}>Join 10,000+ professionals already using<br />ATS Intelligence to optimize their resumes.</div>
         <div style={{ display:'flex', flexDirection:'column', gap:12, marginTop:'auto' }}>
           {[
-            { icon:'🚀', title:'Instant ATS Score',      sub:'Get your score in under 60 seconds' },
-            { icon:'🔍', title:'Keyword Gap Analysis',    sub:'See exactly what your resume is missing' },
-            { icon:'✏️', title:'AI Bullet Rewriter',      sub:'Transform weak bullets into achievements' },
-            { icon:'📄', title:'Resume Builder',          sub:'Build an ATS-optimized resume from scratch' },
+            { icon:'🚀', title:'Instant ATS Score',   sub:'Get your score in under 60 seconds' },
+            { icon:'🔍', title:'Keyword Gap Analysis', sub:'See exactly what your resume is missing' },
+            { icon:'✏️', title:'AI Bullet Rewriter',   sub:'Transform weak bullets into achievements' },
+            { icon:'📄', title:'Resume Builder',       sub:'Build an ATS-optimized resume from scratch' },
           ].map(f => (
             <div key={f.title} style={{ display:'flex', alignItems:'flex-start', gap:12 }}>
               <div style={{ width:34, height:34, background:'rgba(255,255,255,0.15)', borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', fontSize:16, flexShrink:0 }}>{f.icon}</div>
@@ -1990,6 +2025,21 @@ function SignUpPage({ onSignUp, onLogin, onBack }) {
             Already have an account?{' '}
             <button onClick={onLogin} style={{ background:'none', border:'none', color:'#4F46E5', fontWeight:600, cursor:'pointer', fontSize:14, padding:0 }}>Log in</button>
           </p>
+          <button
+            onClick={() => {
+              const w=500,h=600,l=window.screenX+(window.outerWidth-w)/2,t=window.screenY+(window.outerHeight-h)/2;
+              window.open('https://ats-backend-s69p.onrender.com/api/auth/google','google_oauth',`width=${w},height=${h},left=${l},top=${t}`);
+            }}
+            style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'center', gap:10, padding:'11px 14px', border:'1.5px solid #E2E8F0', borderRadius:10, background:'#fff', color:'#0F172A', fontSize:14, fontWeight:500, cursor:'pointer', marginBottom:10, transition:'all .15s', boxShadow:'0 1px 3px rgba(0,0,0,0.05)' }}
+            onMouseEnter={e=>{ e.currentTarget.style.borderColor='#C7D2FE'; e.currentTarget.style.background='#F8FAFC'; }}
+            onMouseLeave={e=>{ e.currentTarget.style.borderColor='#E2E8F0'; e.currentTarget.style.background='#fff'; }}>
+            <GoogleIcon /> Continue with Google
+          </button>
+          <div style={{ display:'flex', alignItems:'center', gap:12, margin:'18px 0', color:'#CBD5E1', fontSize:12 }}>
+            <div style={{ flex:1, height:1, background:'#E2E8F0' }} />
+            or continue with email
+            <div style={{ flex:1, height:1, background:'#E2E8F0' }} />
+          </div>
           {error && <div style={{ background:'#FEF2F2', border:'1px solid #FECACA', color:'#991B1B', padding:'10px 14px', borderRadius:8, fontSize:13, marginBottom:14 }}>⚠️ {error}</div>}
           <div style={{ marginBottom:12 }}>
             <label style={{ fontSize:12, fontWeight:600, color:'#374151', display:'block', marginBottom:6 }}>Full name</label>
