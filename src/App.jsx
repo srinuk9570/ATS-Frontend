@@ -1659,10 +1659,50 @@ function SettingsTab({ user, onLogout }) {
   const [confirmPw,setConfirmPw]=useState('');
   const [pwSaved,setPwSaved]=useState(false);
   const [deleteConfirm,setDeleteConfirm]=useState('');
+  const [pwError,setPwError]=useState('');
+  const [deleteError,setDeleteError]=useState('');
 
   const handleSave=()=>{setSaved(true);setTimeout(()=>setSaved(false),2000);};
   const addKw=()=>{if(kwInput.trim()){setKeywords(k=>[...k,kwInput.trim()]);setKwInput('');}};
-  const handlePwSave=()=>{if(newPw&&newPw===confirmPw){setPwSaved(true);setTimeout(()=>setPwSaved(false),2000);setCurrentPw('');setNewPw('');setConfirmPw('');}};
+
+  const handlePwSave=async()=>{
+    if(!currentPw||!newPw||newPw!==confirmPw)return;
+    setPwError('');
+    try{
+      const token=localStorage.getItem('ats_token');
+      const res=await fetch('https://ats-backend-s69p.onrender.com/api/auth/change-password',{
+        method:'PUT',
+        headers:{'Content-Type':'application/json','Authorization':`Bearer ${token}`},
+        body:JSON.stringify({currentPassword:currentPw,newPassword:newPw})
+      });
+      const data=await res.json();
+      if(!res.ok){setPwError(data.error||'Failed to update password.');return;}
+      setPwSaved(true);
+      setTimeout(()=>setPwSaved(false),2000);
+      setCurrentPw('');setNewPw('');setConfirmPw('');
+    }catch(err){
+      setPwError('Failed to update password. Please try again.');
+    }
+  };
+
+  const handleDelete=async()=>{
+    if(deleteConfirm!=='DELETE')return;
+    setDeleteError('');
+    try{
+      const token=localStorage.getItem('ats_token');
+      const res=await fetch('https://ats-backend-s69p.onrender.com/api/auth/delete-account',{
+        method:'DELETE',
+        headers:{'Authorization':`Bearer ${token}`}
+      });
+      const data=await res.json();
+      if(!res.ok){setDeleteError(data.error||'Failed to delete account.');return;}
+      localStorage.removeItem('ats_token');
+      localStorage.removeItem('ats_user');
+      onLogout();
+    }catch(err){
+      setDeleteError('Failed to delete account. Please try again.');
+    }
+  };
 
   const sideNav=[
     {id:'profile',   icon:'👤',label:'Profile'},
@@ -1722,6 +1762,7 @@ function SettingsTab({ user, onLogout }) {
                 </div>
               ))}
               {newPw&&confirmPw&&newPw!==confirmPw&&<div style={{color:'#DC2626',fontSize:12,marginBottom:10}}>⚠ Passwords do not match</div>}
+              {pwError&&<div style={{color:'#DC2626',fontSize:12,marginBottom:10,padding:'8px 12px',background:'#FEF2F2',borderRadius:8,border:'1px solid #FECACA'}}>⚠ {pwError}</div>}
               <div style={{display:'flex',justifyContent:'flex-end',marginTop:8}}>
                 <button onClick={handlePwSave} disabled={!currentPw||!newPw||newPw!==confirmPw} style={{padding:'10px 24px',background:pwSaved?'#059669':(!currentPw||!newPw||newPw!==confirmPw)?'#94A3B8':'#4F46E5',color:'#fff',border:'none',borderRadius:9,fontSize:13,fontWeight:700,cursor:(!currentPw||!newPw||newPw!==confirmPw)?'not-allowed':'pointer'}}>
                   {pwSaved?'✓ Updated':'Update password'}
@@ -1780,7 +1821,8 @@ function SettingsTab({ user, onLogout }) {
                 <label style={{fontSize:12,color:'#64748B',display:'block',marginBottom:6}}>Type <strong style={{color:'#DC2626'}}>DELETE</strong> to confirm</label>
                 <input style={{...B_INP,borderColor:deleteConfirm==='DELETE'?'#DC2626':'#E2E8F0'}} value={deleteConfirm} onChange={e=>setDeleteConfirm(e.target.value)} placeholder="Type DELETE"/>
               </div>
-              <button disabled={deleteConfirm!=='DELETE'} style={{padding:'11px 24px',background:deleteConfirm==='DELETE'?'#DC2626':'#F1F5F9',color:deleteConfirm==='DELETE'?'#fff':'#94A3B8',border:'none',borderRadius:9,fontSize:13,fontWeight:700,cursor:deleteConfirm==='DELETE'?'pointer':'not-allowed'}}>
+              {deleteError&&<div style={{color:'#DC2626',fontSize:12,marginBottom:10,padding:'8px 12px',background:'#FEF2F2',borderRadius:8,border:'1px solid #FECACA'}}>⚠ {deleteError}</div>}
+              <button onClick={handleDelete} disabled={deleteConfirm!=='DELETE'} style={{padding:'11px 24px',background:deleteConfirm==='DELETE'?'#DC2626':'#F1F5F9',color:deleteConfirm==='DELETE'?'#fff':'#94A3B8',border:'none',borderRadius:9,fontSize:13,fontWeight:700,cursor:deleteConfirm==='DELETE'?'pointer':'not-allowed'}}>
                 Delete my account
               </button>
             </Card>
